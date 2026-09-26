@@ -1,0 +1,14 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "jj-agents",
+  "version": "1.0.0",
+  "description": "Jujutsu (jj) version control for teams of coding agents: one workspace per agent, safe integration, and recovery through the operation log. Bundles a skill, a jj MCP server, and git-write guard hooks.",
+  "author": { "name": "jj-agents course" },
+  "license": "MIT",
+  "keywords": ["jj", "jujutsu", "version control", "vcs", "workspace", "multi-agent", "parallel agents", "commit", "rebase", "conflict"],
+  "extensions": {
+    "com.openai": {
+      "hooks": "./hooks/codex-hooks.json"
+    }
+  }
+}

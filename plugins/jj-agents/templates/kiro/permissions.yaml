@@ -1,0 +1,14 @@
+# Kiro permission rules for Jujutsu (jj) repositories.
+# Install for your user: merge these entries into the `rules:` list of ~/.kiro/settings/permissions.yaml
+# (or use this file as it is if you have none).
+# Deny beats ask beats allow, at every scope; compound commands are split and each part is checked.
+rules:
+  - capability: shell
+    match: ["jj *"]
+    effect: allow
+  - capability: shell
+    match: ["jj undo*", "jj redo*", "jj abandon*", "jj op restore*", "jj op revert*", "jj op abandon*", "jj git push*"]
+    effect: ask
+  - capability: shell
+    match: ["git commit*", "git push*", "git pull*", "git merge*", "git rebase*", "git reset*", "git checkout*", "git switch*", "git stash*", "git cherry-pick*", "git add*", "git worktree add*"]
+    effect: deny

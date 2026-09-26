@@ -1,0 +1,20 @@
+{
+  "name": "jj-agent",
+  "description": "Coding agent for Jujutsu (jj) repositories: uses jj for all version control, never git write commands.",
+  "prompt": "You work in a Jujutsu (jj) repository. Follow the jj rules in the steering file and in AGENTS.md. Use the jj-multi-agent skill for any version-control task.",
+  "tools": ["read", "write", "shell", "@jj"],
+  "resources": [
+    "file://AGENTS.md",
+    "file://.kiro/steering/jj.md",
+    "skill://.kiro/skills/*/SKILL.md",
+    "skill://~/.kiro/skills/*/SKILL.md"
+  ],
+  "includeMcpJson": true,
+  "permissions": {
+    "rules": [
+      { "capability": "shell", "match": ["jj *"], "effect": "allow" },
+      { "capability": "shell", "match": ["jj undo*", "jj redo*", "jj abandon*", "jj op restore*", "jj op revert*", "jj op abandon*", "jj git push*"], "effect": "ask" },
+      { "capability": "shell", "match": ["git commit*", "git push*", "git pull*", "git merge*", "git rebase*", "git reset*", "git checkout*", "git switch*", "git stash*", "git cherry-pick*", "git add*", "git worktree add*"], "effect": "deny" }
+    ]
+  }
+}

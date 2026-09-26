@@ -1,0 +1,48 @@
+# Codex command rules for a Jujutsu (jj) repository.
+# Install: copy to <repo>/.codex/rules/jj.rules (trusted projects only) or ~/.codex/rules/jj.rules.
+# Test:    codex execpolicy check --pretty --rules jj.rules -- git commit -m x
+
+# Git write commands bypass jj's change tracking. Forbid them; the justification is shown to the model.
+prefix_rule(
+    pattern = ["git", ["commit", "push", "pull", "merge", "rebase", "reset", "checkout", "switch", "stash", "cherry-pick", "add"]],
+    decision = "forbidden",
+    justification = "This is a Jujutsu (jj) repository. Use jj instead: jj commit -m, jj new, jj rebase, jj git push --bookmark <name>, jj restore, jj workspace add.",
+    match = [["git", "commit", "-m", "x"], ["git", "push"], ["git", "add", "."]],
+    not_match = [["git", "status"], ["git", "log"], ["git", "diff"]],
+)
+
+prefix_rule(
+    pattern = ["git", "worktree", "add"],
+    decision = "forbidden",
+    justification = "This is a Jujutsu (jj) repository. Create an isolated working directory with: jj workspace add <path> --name <name>.",
+    match = [["git", "worktree", "add", "../x"]],
+    not_match = [["git", "worktree", "list"]],
+)
+
+# History-rewinding jj commands affect every workspace (every agent). Require a human.
+prefix_rule(
+    pattern = ["jj", ["undo", "redo", "abandon"]],
+    decision = "prompt",
+    justification = "jj undo/redo rewind the whole repository, including other agents' workspaces; abandon discards a change. Ask the user first.",
+    match = [["jj", "undo"]],
+)
+prefix_rule(
+    pattern = ["jj", ["op", "operation"], ["restore", "revert", "abandon"]],
+    decision = "prompt",
+    justification = "Operation-log rewrites affect every workspace. Ask the user first.",
+    match = [["jj", "op", "restore", "abc123"]],
+)
+
+# Publishing is a human decision.
+prefix_rule(
+    pattern = ["jj", "git", "push"],
+    decision = "prompt",
+    justification = "Pushing publishes work. Ask the user before pushing.",
+)
+
+# Everyday jj commands are safe inside the agent's own workspace.
+prefix_rule(
+    pattern = ["jj", ["status", "st", "log", "diff", "show", "describe", "desc", "new", "commit", "squash", "split", "evolog", "file", "resolve", "workspace", "bookmark", "git", "op", "config", "rebase", "restore", "edit", "duplicate", "revert", "absorb"]],
+    decision = "allow",
+    match = [["jj", "status"], ["jj", "commit", "-m", "x"]],
+)

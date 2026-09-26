@@ -1,0 +1,9 @@
+{
+  "name": "jj-agents",
+  "displayName": "jj for agent teams",
+  "version": "1.0.0",
+  "description": "Jujutsu (jj) version control for teams of coding agents: one workspace per agent, safe integration, and recovery through the operation log. Bundles a skill, a jj MCP server, git-write guard hooks, and WorktreeCreate/WorktreeRemove hooks that give Claude Code jj workspaces instead of git worktrees.",
+  "author": { "name": "jj-agents course" },
+  "license": "MIT",
+  "keywords": ["jj", "jujutsu", "vcs", "workspaces", "multi-agent"]
+}

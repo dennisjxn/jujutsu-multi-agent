@@ -1,0 +1,14 @@
+{
+  "name": "jj-agents-course",
+  "owner": { "name": "jj-agents course" },
+  "description": "Plugins from the course 'Jujutsu for Multi-Agent Coding'.",
+  "plugins": [
+    {
+      "name": "jj-agents",
+      "source": "./plugins/jj-agents",
+      "description": "Jujutsu (jj) for teams of coding agents: skill, MCP server, and hooks.",
+      "version": "1.0.0",
+      "category": "development"
+    }
+  ]
+}

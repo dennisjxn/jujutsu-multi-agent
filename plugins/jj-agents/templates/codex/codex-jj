@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# codex-jj — launch OpenAI Codex inside a Jujutsu (jj) workspace with the sandbox opened
+# just wide enough for jj to work.
+#
+# Why: under Codex's default `workspace-write` sandbox, the top-level `.git` directory is
+# read-only. jj writes Git objects into `.git` in a colocated repository, and a secondary
+# workspace (created with `jj workspace add`) stores everything in the MAIN workspace's
+# `.jj/` and `.git/`, which are outside the directory Codex was started in.
+# This wrapper finds the main workspace and passes both as extra writable roots, and sets
+# JJ_AGENT=1 so jj's agent-mode config (no editor, no pager) is active for Codex's commands.
+#
+# Usage: codex-jj [codex arguments...]      e.g.  codex-jj            (interactive)
+#                                                  codex-jj exec "fix the failing test"
+#        codex-jj --dry-run [codex args...]   print the command instead of running it
+#        codex-jj --probe                     prove jj can write under Codex's sandbox (no history change)
+set -euo pipefail
+
+dry=0; probe=0
+if [ "${1:-}" = "--dry-run" ]; then dry=1; shift; fi
+if [ "${1:-}" = "--probe" ]; then probe=1; shift; fi
+
+if ! ws_root="$(jj --no-pager workspace root 2>/dev/null)"; then
+  echo "codex-jj: not inside a jj workspace; starting plain codex." >&2
+  [ "$dry" = 1 ] && { echo codex "$@"; exit 0; }
+  exec codex "$@"
+fi
+# The main (default) workspace holds the shared .jj/repo and, when colocated, .git.
+main_root="$(jj --no-pager workspace root --name default 2>/dev/null || echo "$ws_root")"
+
+roots=()
+[ -d "$main_root/.git" ] && roots+=("\"$main_root/.git\"")
+[ "$main_root" != "$ws_root" ] && [ -d "$main_root/.jj" ] && roots+=("\"$main_root/.jj\"")
+joined="$(IFS=,; echo "${roots[*]:-}")"
+
+args=(-c "shell_environment_policy.set.JJ_AGENT=\"1\"")
+[ -n "$joined" ] && args+=(-c "sandbox_workspace_write.writable_roots=[$joined]")
+
+if [ "$probe" = 1 ]; then
+  # Run a harmless write test for each directory jj needs, inside Codex's own sandbox.
+  script='rc=0; for d in "$@"; do if touch "$d/.codex-jj-probe" 2>/dev/null; then rm -f "$d/.codex-jj-probe"; echo "writable: $d"; else echo "READ-ONLY: $d"; rc=1; fi; done; [ "$JJ_AGENT" = 1 ] && echo "JJ_AGENT=1 set" || { echo "JJ_AGENT not set"; rc=1; }; exit $rc'
+  dirs=("$ws_root/.jj")
+  [ -d "$main_root/.git" ] && dirs+=("$main_root/.git")
+  [ "$main_root" != "$ws_root" ] && dirs+=("$main_root/.jj/repo")
+  exec codex sandbox -c 'sandbox_mode="workspace-write"' "${args[@]}" -- sh -c "$script" probe "${dirs[@]}"
+fi
+if [ "$dry" = 1 ]; then
+  printf '%q ' codex "${args[@]}" "$@"; echo
+  exit 0
+fi
+exec codex "${args[@]}" "$@"
