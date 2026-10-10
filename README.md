@@ -13,14 +13,14 @@ control when several AI coding agents (Claude Code, OpenAI Codex, Kiro) work in 
 ## Quick start
 
 ```bash
-git clone https://github.com/jacksodj/jujutsu-multi-agent.git
+git clone https://github.com/dennisjxn/jujutsu-multi-agent.git
 cd jujutsu-multi-agent
 # then follow course/00-setup.md
 
 # Install the plugin directly from GitHub:
-claude plugin marketplace add jacksodj/jujutsu-multi-agent
+claude plugin marketplace add dennisjxn/jujutsu-multi-agent
 claude plugin install jj-agents@jj-agents-course
-codex plugin marketplace add jacksodj/jujutsu-multi-agent
+codex plugin marketplace add dennisjxn/jujutsu-multi-agent
 codex plugin add jj-agents@jj-agents-course
 ```
 

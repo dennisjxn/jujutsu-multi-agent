@@ -128,7 +128,7 @@ Appendices: [A. Command and revset reference](appendix-a-reference.md) ·
 - macOS or Linux (Windows: use WSL2; the labs are Bash scripts).
 - About 1 GB of free disk space, a terminal, and a text editor.
 - The course folder: clone it with
-  `git clone https://github.com/jacksodj/jujutsu-multi-agent.git`. It contains
+  `git clone https://github.com/dennisjxn/jujutsu-multi-agent.git`. It contains
   `course/` (these pages and `labs/`) and
   `plugins/jj-agents/` (the plugin you study in Modules 5–6). Keep them side by side: the
   labs refer to the plugin by relative path.
